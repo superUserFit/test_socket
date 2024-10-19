@@ -4,8 +4,8 @@ import { Button, Card, CardBody, CardHeader, Flex, Link, Text } from "@chakra-ui
 import Cookies from "js-cookies";
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSocket } from "../../../context/socket/SocketContext";
-import { JobOrderHasAssignment } from "../../../../interfaces/job_order/JobOrderHasAssignment";
+import { useSocket } from "../../context/socket/SocketContext";
+import { JobOrderHasAssignment } from "../../interfaces/job_order/JobOrderHasAssignment";
 import { useAxios } from "@/components/axios";
 import { AxiosError } from "axios";
 import { useShowToast } from "@/components/useShowToast";
@@ -13,8 +13,7 @@ import { useRecoilValue } from "recoil";
 import userAtom from "@/context/atom/userAtom";
 
 
-
-export const ChatPage = () => {
+const ChatPage = () => {
     const router = useRouter();
     const showToast = useShowToast();
     const { socket } = useSocket();
@@ -51,6 +50,17 @@ export const ChatPage = () => {
     }
 
 
+    const handleJoinChatRoom = (jobOrderHasAssignment:JobOrderHasAssignment) => {
+        const message = JSON.stringify({
+            action: 'joinChatRoom',
+            room: jobOrderHasAssignment.jobID
+        });
+
+        socket.send(message);
+        router.push(`/chat_room/${jobOrderHasAssignment.UUID}`);
+    }
+
+
     useEffect(() => {
         getJobOrderHasAssignmentByUser();
     }, [user]);
@@ -81,11 +91,9 @@ export const ChatPage = () => {
                         <CardBody>
                             <Text>{jobOrderHasAssignment.pickupLocation}</Text>
                             <Text>{jobOrderHasAssignment.pickupAddress}</Text>
-                            <Link href={`/chat_room/${jobOrderHasAssignment.UUID}`}>
-                                <Button width={"100%"} marginTop={8}>
-                                    <Text>Join</Text>
-                                </Button>
-                            </Link>
+                            <Button width={"100%"} marginTop={8} onClick={() => handleJoinChatRoom(jobOrderHasAssignment)}>
+                                <Text>Join</Text>
+                            </Button>
                         </CardBody>
                     </Card>
                 ))}
@@ -107,3 +115,5 @@ export const ChatPage = () => {
         </Flex>
     );    
 }
+
+export default ChatPage;

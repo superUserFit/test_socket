@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import userAtom from "../context/atom/userAtom";
 import { redirect, useRouter } from "next/navigation";
-import { ChatPage } from "./pages/chat_room/page";
+import { ChatPage } from "./chat_room/page";
 
 
 
@@ -17,6 +17,8 @@ export default function Home() {
     if(!user) {
       // redirect('/login');
       router.push('/login');
+    } else {
+      router.push('/chat_room');
     }
   }, [user]);
 
@@ -24,7 +26,7 @@ export default function Home() {
   return (
     <Container>
       <Flex justifyContent={"center"} alignItems={"center"}>
-        <ChatPage/>
+        {/* <ChatPage/> */}
       </Flex>
     </Container>
   );
