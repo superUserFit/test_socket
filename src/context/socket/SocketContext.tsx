@@ -26,7 +26,7 @@ export const SocketContextProvider:React.FC<SocketContextProviderProps>  = ({ ch
     const user = useRecoilValue(userAtom);
 
     useEffect(() => {
-        const newSocket = new WebSocket("ws://localhost:8080");
+        const newSocket = new WebSocket("ws://localhost:5050");
         setSocket(newSocket);
 
         return () => {

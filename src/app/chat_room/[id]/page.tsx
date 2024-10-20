@@ -1,8 +1,8 @@
 "use client";
 
-import { 
-    Button, 
-    Flex, 
+import {
+    Button,
+    Flex,
     Text,
     Box,
     VStack,
@@ -11,11 +11,14 @@ import {
 import { useParams, useRouter } from "next/navigation";
 
 import { useSocket } from "@/context/socket/SocketContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import userAtom from "@/context/atom/userAtom";
 
 
 const ChatRoom = () => {
     const router = useRouter();
+    const user = useRecoilValue(userAtom);
     const { id } = useParams();
     const { socket } = useSocket();
 
@@ -34,13 +37,43 @@ const ChatRoom = () => {
 
 
     const handleSendMessage = () => {
-        const message = JSON.stringify({
-            action: 'sendMessage',
-            room: id
-        });
+        if(text.trim() !== "") {
+            setMessages([...messages, { id: 'ID', text: text, sender: user.id}]);
+            setText("");
+        }
 
-        socket.send(message);
+        socket.send(JSON.stringify({
+            Authorization: "Basic Auth",
+            action: "sendMessage",
+            message: {
+                text: text,
+                sender: user.id
+            }
+        }));
     }
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleMessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("Received message:", data);
+
+            if (data.action === "sendMessage") {
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    { id: data.message.id, text: data.message.text, sender: data.message.sender }
+                ]);
+            }
+        };
+
+        socket.addEventListener('message', handleMessage);
+
+        return () => {
+            socket.removeEventListener('message', handleMessage);
+        };
+    }, [socket]);
+
 
 
     return (
@@ -61,6 +94,8 @@ const ChatRoom = () => {
                     Leave
                 </Button>
             </Box>
+
+            {/* Message display area */}
             <VStack
                 spacing={3}
                 align="stretch"
@@ -73,17 +108,28 @@ const ChatRoom = () => {
                 p={4}
                 bg="white"
             >
-                {messages.map((msg) => (
-                    <Box
-                        key={msg.id}
-                        bg="blue.100"
-                        p={3}
-                        borderRadius="md"
+                {messages.map((message) => {
+                    console.log('Sender: ', message.sender);
+                    return(
+                        <Flex
+                        key={message.id}
+                        justify={message.sender === user.id ? 'flex-end' : 'flex-start'}
                     >
-                        <Text>{msg.text}</Text>
-                    </Box>
-                ))}
+                        <Box
+                            bg={message.sender === user.id ? 'blue.200' : 'gray.200'}
+                            p={3}
+                            borderRadius="md"
+                            maxW="70%"
+                            alignSelf={message.sender === user.id ? 'flex-end' : 'flex-start'}
+                        >
+                            <Text>{message.text}</Text>
+                        </Box>
+                    </Flex>
+                    );
+                })}
             </VStack>
+
+            {/* Message input and send button */}
             <Flex mt={4} w="full">
                 <Input
                     value={text}

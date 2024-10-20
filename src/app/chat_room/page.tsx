@@ -35,7 +35,7 @@ const ChatPage = () => {
         formData.append('param[limit]', '10');
 
         try {
-            const response = await axios.post('/job_order/api/job-order/get-job-order-has-assignment-by-user-2', formData);
+            const response = await axios.post('/job_order/api/job-order/get-job-order-has-assignment-by-user', formData);
             const data = response.data;
 
             setJobOrderHasAssignments(data.rows);
@@ -98,7 +98,7 @@ const ChatPage = () => {
                     </Card>
                 ))}
             </Flex>
-    
+
             {/* Fixed Logout Button at the bottom */}
             <Button
                 background={"red"}
@@ -113,7 +113,7 @@ const ChatPage = () => {
                 <Text>Logout</Text>
             </Button>
         </Flex>
-    );    
+    );
 }
 
 export default ChatPage;

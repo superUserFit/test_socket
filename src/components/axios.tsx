@@ -8,9 +8,12 @@ import { useEffect } from "react";
 export const useAxios = () => {
     const user = useRecoilValue(userAtom);
 
+    // const BASE_URL = "http://192.168.1.101/1ofis/application/backend";
+    const BASE_URL = "https://1ofis.infollective.com/application/backend";
+
     // Create an Axios instance
     const axios = myAxios.default.create({
-        baseURL: "http://192.168.1.101/1ofis/application/backend",
+        baseURL: BASE_URL,
     });
 
     useEffect(() => {
@@ -22,7 +25,6 @@ export const useAxios = () => {
             }
             return config;
         }, (error) => {
-            // Handle error here
             return Promise.reject(error);
         });
     }, [user]);
